@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Universal Sports Interactive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* VILLAINS Neon Theme */
+            --bg-dark: #0b0b12;
+            --panel-bg: #161625;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ea;
+            --neon-green: #39ff14;
+            --neon-red: #ff073a;
+            --text-main: #ffffff;
+            --text-muted: #a0aab5;
+            --correct: #39ff14;
+            --incorrect: #ff073a;
+            --radius-lg: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+              radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.05), transparent 25%),
+              radial-gradient(circle at 85% 30%, rgba(255, 0, 234, 0.05), transparent 25%);
+        }
+
+        #particles {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header-banner {
+            background-color: rgba(11, 11, 18, 0.9);
+            border-bottom: 2px solid var(--neon-pink);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 0, 234, 0.3);
+            z-index: 10;
+        }
+
+        .header-banner h1 {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-pink);
+        }
+
+        .stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        #app-container {
+            max-width: 900px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .level-card {
+            background: var(--panel-bg);
+            border: 2px solid #333;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            opacity: 0.9;
+        }
+
+        .level-card:hover {
+            opacity: 1;
+            transform: scale(1.05) translateY(-5px);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.4), inset 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .level-card h2, .level-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px var(--neon-blue);
+            margin-top: 1rem;
+            text-transform: uppercase;
+        }
+
+        .level-image {
+            width: 100%;
+            height: auto;
+            max-height: 280px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid var(--neon-pink);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .action-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 15px;
+            background: rgba(22, 22, 37, 0.8);
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            color: white;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            border-color: var(--neon-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+            color: var(--neon-blue);
+        }
+        
+        .action-btn:hover:not(:disabled)::before { left: 100%; }
+        .action-btn:active:not(:disabled) { transform: translateY(1px); }
+
+        .btn-correct { background-color: rgba(57, 255, 20, 0.2) !important; border-color: var(--neon-green) !important; box-shadow: 0 0 15px var(--neon-green) !important; color: var(--neon-green) !important; }
+        .btn-wrong { background-color: rgba(255, 7, 58, 0.2) !important; border-color: var(--neon-red) !important; box-shadow: 0 0 15px var(--neon-red) !important; color: var(--neon-red) !important; }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .nav-buttons { flex-direction: column; gap: 15px; }
+            .nav-buttons .action-btn { width: 100% !important; margin-top: 0; }
+        }
+
+        .reading-container {
+            background: var(--panel-bg);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            border: 2px solid #333;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .reading-container h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .word-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 243, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid var(--neon-blue);
+        }
+
+        .cloud-word {
+            background: var(--bg-dark);
+            color: var(--neon-blue);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            border: 1px solid var(--neon-blue);
+            transition: all 0.3s;
+        }
+
+        .cloud-word.found {
+            background: rgba(57, 255, 20, 0.2);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            text-decoration: line-through;
+        }
+
+        .interactive-word {
+            cursor: pointer;
+            padding: 0 2px;
+            border-bottom: 1px dashed var(--neon-blue);
+            transition: background 0.2s;
+        }
+
+        .interactive-word.revealed {
+            background: var(--neon-blue);
+            color: #000;
+            font-weight: bold;
+        }
+
+        hr { border: 0; height: 1px; background: #333; margin: 2rem 0; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: var(--bg-dark);
+            color: var(--neon-blue);
+            margin-top: 1rem;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .flashcard-scene {
+            width: 100%;
+            height: 300px;
+            perspective: 1000px;
+            margin: 2rem 0;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-pink);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 0 20px rgba(255, 0, 234, 0.2);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--neon-pink);
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background: var(--bg-dark);
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+        }
+
+        .sentence-dropzone, .word-bank {
+            min-height: 80px;
+            border: 2px dashed #444;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--bg-dark);
+        }
+        .draggable-word {
+            padding: 10px 15px;
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            transition: transform 0.1s;
+            user-select: none;
+        }
+        .draggable-word:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.3s ease-out forwards; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    
+    <header class="header-banner">
+        <h1>GLOBAL SPORTS</h1>
+        <div class="stats">
+            <span id="xp-counter">⭐ 0 XP</span>
+        </div>
+    </header>
+    
+    <main id="app-container">
+        <!-- Content injected dynamically via JavaScript -->
+    </main>
+
+    <script>
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particlesArray = [];
+            const colors = ['#00f3ff', '#FF7700', '#00F0FF'];
+
+            for (let i = 0; i < 50; i++) {
+                particlesArray.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedY: Math.random() * 1 - 0.5,
+                    speedX: Math.random() * 1 - 0.5,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    let p = particlesArray[i];
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('particles');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // --- DATA LAYER ---
+const athletesDB = [
+    { name: "Kylian Mbappé", country: "France", img: "https://upload.wikimedia.org/wikipedia/commons/9/95/Kylian_Mbappe_France_v_Senegal_16_June_2026-391_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Lamine Yamal", country: "Spain", img: "https://upload.wikimedia.org/wikipedia/commons/1/13/Lamine_Yamal_France_v_Spain_7.24.26-142.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Lionel Messi", country: "Argentina", img: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Lionel_Messi_WC2022.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Erling Haaland", country: "Norway", img: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Erling_Haaland_France_v_Norway_26_June_26-008.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Jude Bellingham", country: "England", img: "https://upload.wikimedia.org/wikipedia/commons/2/23/Jude_Bellingham_England_v_Ghana_23_June_2026-061_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Vinícius Júnior", country: "Brazil", img: "https://upload.wikimedia.org/wikipedia/commons/1/10/Vin%C3%ADcius_J%C3%BAnior_Brazil_V_Morocco_13_June_2026-207_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Harry Kane", country: "England", img: "https://upload.wikimedia.org/wikipedia/commons/0/02/Harry_Kane_2023.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Rodri", country: "Spain", img: "https://upload.wikimedia.org/wikipedia/commons/4/45/Rodri_Argentina_v_Spain_19_July_2026-163.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Michael Olise", country: "France", img: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Michael_Olise_France_v_Senegal_16_June_2026-273.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Ousmane Dembélé", country: "France", img: "https://upload.wikimedia.org/wikipedia/commons/c/c6/Ousmane_Dembele_France_v_Senegal_16_June_2026-263_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Cristiano Ronaldo", country: "Portugal", img: "https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Mohamed Salah", country: "Egypt", img: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Mohamed_Salah_2021_CAN_Final.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Kevin De Bruyne", country: "Belgium", img: "https://upload.wikimedia.org/wikipedia/commons/4/40/Kevin_De_Bruyne_201807091.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Achraf Hakimi", country: "Morocco", img: "https://upload.wikimedia.org/wikipedia/commons/3/36/Achraf_Hakimi_Morocco_v_Norway_7_June_2026-32.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "William Saliba", country: "France", img: "https://upload.wikimedia.org/wikipedia/commons/b/bb/William_Saliba_France_v_Norway_26_June_26-044.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Pedri", country: "Spain", img: "https://upload.wikimedia.org/wikipedia/commons/3/39/Pedri_Argentina_v_Spain_19_July_2026-164.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Enzo Fernández", country: "Argentina", img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/Enzo_Fernandez_Argentina_v_Spain_19_July_2026-050.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Jamal Musiala", country: "Germany", img: "https://upload.wikimedia.org/wikipedia/commons/4/44/Jamal_Musiala_Ecuador_v_Germany_25_June_2026-174_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Bukayo Saka", country: "England", img: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Bukayo_Saka_England_v_Ghana_23_June_2026-057_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Martin Ødegaard", country: "Norway", img: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Martin_%C3%98degaard.JPG?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Bruno Fernandes", country: "Portugal", img: "https://upload.wikimedia.org/wikipedia/commons/3/31/Bruno_Fernandes_USMNT_v_Portugal_Mar_31_2026-27.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Christian Pulisic", country: "United States", img: "https://upload.wikimedia.org/wikipedia/commons/4/44/Christian_Pulisic_Australia_v_USA_19_June_2026-67.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Lautaro Martínez", country: "Argentina", img: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lautaro_Martinez_Argentina_v_Egypt_7_July_2026-040.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Julián Álvarez", country: "Argentina", img: "https://upload.wikimedia.org/wikipedia/commons/b/b0/Julian_Alvarez_Argentina_v_Spain_19_July_2026-173.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" },
+    { name: "Neymar", country: "Brazil", img: "https://upload.wikimedia.org/wikipedia/commons/6/65/20180610_FIFA_Friendly_Match_Austria_vs._Brazil_Neymar_850_1705.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" }
+];
+
+const ALL_COUNTRIES = [
+    "France", "Spain", "Argentina", "Norway", "England", "Brazil", 
+    "Portugal", "Egypt", "Belgium", "Morocco", "Germany", "United States", 
+    "Netherlands", "Italy", "Croatia", "Japan", "South Korea", "Uruguay"
+];
+
+// --- Sports emoji ---
+ const sportsDB = [
+    { name: "Football (Soccer)", emoji: "⚽" },
+    { name: "Cricket", emoji: "🏏" },
+    { name: "Basketball", emoji: "🏀" },
+    { name: "Baseball", emoji: "⚾" },
+    { name: "Badminton", emoji: "🏸" },
+    { name: "Pickleball", emoji: "🏓" },
+    { name: "Indoor Climbing", emoji: "🧗" },
+    { name: "Cheese Rolling", emoji: "🧀🏃" },
+    { name: "Sepak Takraw", emoji: "🦵🏐" },
+    { name: "Wife Carrying", emoji: "👫🏃" },
+    { name: "Underwater Hockey", emoji: "🤿🏒" },
+    { name: "Extreme Ironing", emoji: "🏄👕" },
+    { name: "Toe Wrestling", emoji: "🦶🤼" },
+    { name: "Bog Snorkelling", emoji: "🤿🏊" },
+    { name: "Golf", emoji: "⛳" },
+    { name: "Tennis", emoji: "🎾" },
+    { name: "Track & Field", emoji: "🏃" },
+    { name: "Swimming", emoji: "🏊" },
+    { name: "Gymnastics", emoji: "🤸" },
+    { name: "Muay Thai", emoji: "🥊🇹🇭" },
+    { name: "Formula 1", emoji: "🏎️" },
+    { name: "MotoGP", emoji: "🏍️" },
+    { name: "Boxing", emoji: "🥊" },
+    { name: "MMA", emoji: "🤼" },
+    { name: "Billiards", emoji: "🎱" },
+    { name: "Skateboarding", emoji: "🛹" },
+    { name: "Surfing", emoji: "🏄" },
+    { name: "Snowboarding", emoji: "🏂" }
+];       
+
+        const ALL_SPORTS = [
+            "Football (Soccer)", "Cricket", "Basketball", "Baseball", "Badminton", 
+            "Pickleball", "Indoor Climbing", "Cheese Rolling", "Sepak Takraw", 
+            "Wife Carrying", "Underwater Hockey", "Extreme Ironing", "Toe Wrestling", "Bog Snorkelling","Muay Thai", "Golf", "Tennis", "Track & Field", "Swimming", "Gymnastics","Formula 1", "MotoGP", "Boxing", "MMA", "Billiards", "Skateboarding", "Surfing", "Snowboarding"
+        ];
+
+        const courseData = {
+  levels: [
+    {
+      id: "basic",
+      title: "World Cup 2026 - Basic",
+      description: "Learn about the 2026 World Cup tournament, its unexpected upsets, and the new champions.",
+      image: "Images/Football.jpg",
+      reading: [
+        { country: "A World Tournament", text: "This past summer, all over the world, people watched the FIFA World Cup. 48 teams from 48 different countries competed to be number one. In the end, there could only be one champion, but along the way, the whole globe was cheering for their favorite teams or athletes. Before the final game, there is a whole tournament that needs to be played, starting with a group stage. Only the best teams go onto the next stage, the elimination or knockout round. When there are only eight teams left, we call it the quarter-finals. This year, Spain became the champions when they beat Argentina." },
+        { country: "Where Heroes are Born", text: "Only one team could be the champions, but many other teams became heroes in their home countries. Some stars like Lionel Messi, or Cristiano Ronaldo, finished their World Cup careers. One of the new global stars is Erling Haaland from Norway. His fun personality has him showing up in memes and even a commercial for a Chinese herbal tea brand, Walovi. Because of this, people who have never watched a football game have been singing his name and recognize21 his face." },
+        { country: "The Unexpected", text: "The other big stories this year were the huge upsets that we saw. The underdogs from DR Congo tied the previous champions, Portugal, with a 1-1 draw. This year, Spain might have been the champions, but earlier in the tournament, they couldn’t score against Cape Verde and they tied 0-0. These underdog stories are often seen as a kind of fairy tale. The team that isn’t expected to win, but clearly tried their best, sometimes end up receiving more love from fans than the champions2 themselves." },
+        { country: "The Heroes Lose", text: "Argentina was expected to be the best this year, but in the end, Argentina lost more than a soccer game. People watched them play dirty and unfair. At the end of the game, they even attacked the Spanish players and started a fight. They didn’t show sportsmanship. It might just be a game, but it is full of passion and drama, , and a story that was watched by more than a billion people." }
+      ],
+      vocabulary: [
+        { word: "tournament", chinese: "錦標賽", icon: "🏆" },
+        { word: "champion", chinese: "冠軍", icon: "🥇" },
+        { word: "commercial", chinese: "廣告", icon: "📺" },
+        { word: "upset", chinese: "爆冷門", icon: "😲" },
+        { word: "underdog", chinese: "不被看好的隊伍", icon: "🐕" },
+        { word: "sportsmanship", chinese: "體育精神", icon: "🤝" }
+      ],
+      questions: [
+        { type: "fill", q: "1. How many teams were there at the start of the 2026 World Cup?", answer: "48" },
+        { type: "mc", q: "2. In a tournament, when there are only 8 teams remaining, what do we call those games?", options: ["Grand final", "Quarter-finals", "Semi-finals", "The final"], answer: 1 },
+        { type: "fill", q: "3. Which famous player became a global meme, and even was in a Chinese commercial?", answer: "Erling Haaland" },
+        { type: "fill", q: "4.What were the two countries playing in the grand final or championship game in the 2026 World Cup?", answer: "Argentina vs. Spain" },
+        { type: "fill", q: "5.Which team team actually did become the 2026 World Cup champions?", answer: "Spain" }
+      ],
+      unscrambleWords: ["tournament", "commercial", "champion", "underdog", "passion"],
+      sentences: [
+        "Only one team could be the champions, but many other teams became heroes.",
+        "The games that no one expected to be possible.",
+        "Some people think winning is all that matters."
+      ]
+    },
+    {
+      id: "intermediate",
+      title: "World Cup 2026 - Advanced",
+      description: "Deep dive into the elimination rounds, heroic goalkeepers, and teams turning from heroes to villains[cite: 3].",
+      image: "Images/Football.jpg",
+      reading: [
+        { country: "A World Tournament", text: "48 teams from 48 different countries competed to be number one[cite: 3]. The World Cup is single elimination, or sometimes called the knockout round, where there can be no more ties[cite: 3]. 32 teams become 16 teams, and 16 becomes 8[cite: 3]. Then we move onto the semi-finals, and at last the final game, sometimes called the grand final[cite: 3]. This year, the Spanish team became the champions when they beat the Argentinian team[cite: 3]." },
+        { country: "Where Heroes are Born", text: "Some of the teams and players found new admirers and fans, even though they lost[cite: 3]. People saw how hard they struggled, and how much they improved[cite: 3]. One of those new global stars is Erling Haaland from Norway[cite: 3]. His fame went far outside of the football pitch[cite: 3]. Because of this, people who have never watched a football game have been singing his name and recognize his face[cite: 3]." },
+        { country: "The Unexpected", text: "The underdogs from DR Congo tied the previous champions, Portugal, with a 1-1 draw[cite: 3]. Cape Verde’s goalkeeper, named Vozinha, shocked the world[cite: 3]. He is 40 years old, an age when most people quit playing professionally, but is now a hero in his home country[cite: 3]. Football clubs all over the world were hoping he would come play for one of their teams[cite: 3]." },
+        { country: "From Heroes to Villains", text: "Argentina was expected to win, and people were cheering on Messi the whole tournament, but in the end, Argentina lost more than just a soccer game[cite: 3]. People watched them not only play with less skill and talent than Spain, they also saw them play dirty and unfair[cite: 3]. They didn’t show the sportsmanship that you would expect from some of the best players in the world[cite: 3]. Some people think winning is all that matters, and even if you have to cheat, or break rules to win it is fine[cite: 3]." }
+      ],
+      vocabulary: [
+        { word: "elimination", chinese: "淘汰", icon: "❌" },
+        { word: "struggle", chinese: "奮鬥", icon: "💪" },
+        { word: "pitch", chinese: "足球場", icon: "🏟️" },
+        { word: "shocked", chinese: "震驚的", icon: "😲" },
+        { word: "villain", chinese: "反派主角", icon: "🦹" },
+        { word: "passion", chinese: "熱情", icon: "❤️‍🔥" }
+      ],
+      questions: [
+        { type: "mc", q: "1. How many teams made it to the elimination or knockout round of the World Cup?[cite: 3]", options: ["48 teams", "32 teams", "16 teams", "2 teams"], answer: 1 },
+        { type: "fill", q: "2. What name is given to teams or players that are not expected to win?[cite: 3]", answer: "underdogs" },
+        { type: "mc", q: "3. Which team finished in second place during the 2026 FIFA World Cup?[cite: 3]", options: ["Spain", "Argentina", "Portugal", "Cape Verde"], answer: 1 },
+        { type: "fill", q: "4. When will the next World Cup take place?[cite: 3]", answer: "2030" }
+      ],
+      unscrambleWords: ["elimination", "villain", "spectator", "struggle", "passion"],
+      sentences: [
+        "The team that isn't expected to win sometimes ends up receiving more love.",
+        "Some people think winning is all that matters, and even if you cheat it is fine.",
+        "It might just be a game, but it is full of passion and drama."
+      ]
+    }
+  ]
+};
+        // --- APPLICATION LOGIC ---
+        const appContainer = document.getElementById('app-container');
+        let currentLevel = null;
+        let userXP = parseInt(localStorage.getItem('userXP')) || 0;
+        
+        let currentReadingIndex = 0; 
+        let currentQuestionIndex = 0;
+        let currentFlashcardIndex = 0;
+        let currentVocabUnscrambleIndex = 0;
+        let currentSentenceIndex = 0;
+        let athleteChallengeIndex = 0;
+        let sportChallengeIndex = 0;
+        
+        let wordsToFind = [];
+        let activeAthletes = [];
+        let activeSports = [];
+
+        function init() {
+            initParticles();
+            updateXP(0);
+            renderHome();
+        }
+
+        function updateXP(amount) {
+            userXP += amount;
+            localStorage.setItem('userXP', userXP);
+            document.getElementById('xp-counter').textContent = `⭐ ${userXP} XP`;
+        }
+
+        function renderHome() {
+            appContainer.innerHTML = `
+                <div class="card-grid animate-pop">
+                    ${courseData.levels.map(level => `
+                        <div class="level-card" onclick="startLevel('${level.id}')">
+                            <img src="${level.image}" alt="${level.title}" class="level-image" onerror="this.src='https://placehold.co/400x200/161625/00f3ff?text=${level.title}'">
+                            <h2>${level.title}</h2>
+                            <p style="color: var(--text-muted);">${level.description}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function startLevel(levelId) {
+            currentLevel = courseData.levels.find(l => l.id === levelId);
+            renderMenu();
+        }
+
+        function renderMenu() {
+            appContainer.innerHTML = `
+                <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderHome()">← Back to Levels</button>
+                <h1 style="text-align:center; font-family:'Orbitron', sans-serif; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue);">${currentLevel.title.toUpperCase()}</h1>
+                <div class="card-grid animate-pop">
+                    <div class="level-card" onclick="startReading()">
+                        <div style="font-size: 3rem;">📖</div>
+                        <h3>Reading Mission</h3>
+                    </div>
+                    <div class="level-card" onclick="startQuiz()">
+                        <div style="font-size: 3rem;">❓</div>
+                        <h3>Knowledge Check</h3>
+                    </div>
+                    <div class="level-card" onclick="startFlashcards()">
+                        <div style="font-size: 3rem;">🎴</div>
+                        <h3>Vocab Flashcards</h3>
+                    </div>
+                    <div class="level-card" onclick="startVocabUnscramble()">
+                        <div style="font-size: 3rem;">🔀</div>
+                        <h3>Unscramble Vocab</h3>
+                    </div>
+                    <div class="level-card" onclick="startSentenceUnscramble()">
+                        <div style="font-size: 3rem;">🧩</div>
+                        <h3>Sentence Builder</h3>
+                    </div>
+                    <div class="level-card" onclick="startAthleteChallenge()">
+                         <div style="font-size: 3rem;">🌍</div>
+                        <h3>Guess the Country</h3>
+                        </div>
+
+                    <div class="level-card" onclick="startSportChallenge()">
+                        <div style="font-size: 3rem;">🧩</div>
+                         <h3>Emoji Sport Guess</h3>
+                    </div>
+                    
+                </div>
+            `;
+        }
+
+        // --- ACTIVITY 1: READING WITH PAGINATION ---
+        function startReading() {
+            currentReadingIndex = 0; 
+            renderReading();
+        }
+
+        function renderReading() {
+            wordsToFind = currentLevel.vocabulary.map(v => v.word.toLowerCase());
+            const cloudHTML = currentLevel.vocabulary.map(v => 
+                `<span class="cloud-word" id="cloud-${v.word.replace(/\s+/g, '-').toLowerCase()}">${v.word}</span>`
+            ).join('');
+
+            const isFirst = currentReadingIndex === 0;
+            const isLast = currentReadingIndex === currentLevel.reading.length - 1;
+            const currentPassage = currentLevel.reading[currentReadingIndex];
+
+            const interactiveText = currentPassage.text.replace(/([a-zA-Z0-9-]+)/g, '<span class="interactive-word" onclick="checkWord(this)">$1</span>');
+
+            appContainer.innerHTML = `
+                <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+                <div class="reading-container animate-pop">
+                    <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                        <span>Page ${currentReadingIndex + 1} of ${currentLevel.reading.length}</span>
+                    </div>
+
+                    <h2 style="margin-top:0; color: #fff;">Find the Vocabulary!</h2>
+                    <div class="word-cloud">
+                        ${cloudHTML}
+                    </div>
+                    
+                    <h2 style="color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink);">📍 ${currentPassage.country}</h2>
+                    <p style="font-size: 1.2rem; line-height: 1.8;">${interactiveText}</p>
+                    <hr>
+                    
+                    <div class="nav-buttons">
+                        <button class="action-btn" style="width:48%;" onclick="navigateReading(-1)" ${isFirst ? 'disabled style="opacity:0.5"' : ''}>Previous Page</button>
+                        ${isLast ? 
+                            `<button class="action-btn btn-correct" style="width:48%;" onclick="updateXP(20); startQuiz();">Complete & Continue to Quiz (+20 XP)</button>` : 
+                            `<button class="action-btn" style="width:48%;" onclick="navigateReading(1)">Next Page</button>`
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function navigateReading(direction) {
+            currentReadingIndex += direction;
+            renderReading();
+        }
+
+        function checkWord(element) {
+            const clickedWord = element.innerText.toLowerCase().trim();
+            const matchedVocab = wordsToFind.find(word => {
+                if (word === clickedWord) return true;
+                const phraseWords = word.split(' ');
+                return phraseWords.includes(clickedWord);
+            });
+
+            if (matchedVocab) {
+                element.classList.add('revealed');
+                const cloudEl = document.getElementById(`cloud-${matchedVocab.replace(/\s+/g, '-')}`);
+                if (cloudEl && !cloudEl.classList.contains('found')) {
+                    cloudEl.classList.add('found');
+                    updateXP(5);
+                }
+            } else {
+                element.classList.add('shake');
+                setTimeout(() => element.classList.remove('shake'), 400);
+            }
+        }
+
+        // --- ACTIVITY 2: QUIZ ---
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const qData = currentLevel.questions[currentQuestionIndex];
+            const isLast = currentQuestionIndex === currentLevel.questions.length - 1;
+            const isFirst = currentQuestionIndex === 0;
+            let interactionHTML = '';
+            
+            if (qData.type === 'mc') {
+                interactionHTML = `
+                    <div id="mc-options" style="display:flex; flex-direction:column; gap:10px; margin-top: 2rem;">
+                        ${qData.options.map((opt, index) => `
+                            <button class="action-btn" style="text-align: left; text-transform:none;" 
+                            onclick="checkQuizAnswer(this, ${index}, ${qData.answer}, 'mc')">${opt}</button>
+                        `).join('')}
+                    </div>`;
+            } else if (qData.type === 'fill') {
+                interactionHTML = `
+                    <div style="margin-top: 2rem;">
+                        <input type="text" id="fill-input" placeholder="Type your answer here..." autocomplete="off">
+                        <button class="action-btn" style="margin-top:1rem;" onclick="checkQuizAnswer(document.getElementById('fill-input'), null, '${qData.answer}', 'fill')">Check Answer</button>
+                    </div>`;
+            }
+
+            appContainer.innerHTML = `
+                <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+                <div class="reading-container animate-pop">
+                    <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                        <span>Question ${currentQuestionIndex + 1} of ${currentLevel.questions.length}</span>
+                    </div>
+                    <p style="font-size: 1.3rem; font-weight: bold; color: var(--neon-blue);">${qData.q}</p>
+                    ${interactionHTML}
+                    
+                    <div class="nav-buttons">
+                        <button class="action-btn" style="width:48%;" onclick="navigateQuiz(-1)" ${isFirst ? 'disabled style="opacity:0.5"' : ''}>Previous</button>
+                        <button class="action-btn" style="width:48%;" onclick="navigateQuiz(1)">${isLast ? 'Finish Quiz' : 'Next Question'}</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkQuizAnswer(element, selectedIndex, correctAnswer, type) {
+            if (type === 'mc') {
+                const allButtons = element.parentElement.querySelectorAll('button');
+                allButtons.forEach(btn => btn.style.pointerEvents = 'none');
+
+                if (selectedIndex === correctAnswer) {
+                    element.classList.add('btn-correct');
+                    updateXP(10);
+                } else {
+                    element.classList.add('btn-wrong');
+                    element.classList.add('shake');
+                    allButtons[correctAnswer].classList.add('btn-correct');
+                }
+            } else if (type === 'fill') {
+                const userAnswer = element.value.trim().toLowerCase();
+                const actualAnswer = correctAnswer.toLowerCase();
+                if (userAnswer.length > 3 && actualAnswer.includes(userAnswer) || userAnswer === actualAnswer) {
+                    element.style.borderColor = 'var(--neon-green)';
+                    element.style.boxShadow = '0 0 15px var(--neon-green)';
+                    updateXP(15);
+                    alert("Correct!");
+                } else {
+                    element.style.borderColor = 'var(--neon-red)';
+                    element.classList.add('shake');
+                    setTimeout(() => element.classList.remove('shake'), 400);
+                    alert(`Not quite! Hint: ${correctAnswer}`);
+                }
+            }
+        }
+
+        function navigateQuiz(direction) {
+            currentQuestionIndex += direction;
+            if (currentQuestionIndex >= currentLevel.questions.length) {
+                alert("Quiz Completed! Great job.");
+                renderMenu();
+            } else {
+                renderQuiz();
+            }
+        }
+
+        // --- ACTIVITY 3: FLASHCARDS ---
+        function startFlashcards() {
+            currentFlashcardIndex = 0;
+            renderFlashcardUI();
+        }
+
+        function renderFlashcardUI() {
+            const vocab = currentLevel.vocabulary;
+            const currentCard = vocab[currentFlashcardIndex];
+            appContainer.innerHTML = `
+                <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+                <div class="reading-container animate-pop" style="text-align:center;">
+                    <h2 style="margin-top:0;">Vocabulary Study</h2>
+                    <p style="color:var(--text-muted);">Card ${currentFlashcardIndex + 1} of ${vocab.length} (Click card to flip)</p>
+                    
+                    <div class="flashcard-scene" onclick="flipCard(this)">
+                        <div class="flashcard">
+                            <div class="flashcard-face flashcard-front">
+                                ${currentCard.word}
+                            </div>
+                            <div class="flashcard-face flashcard-back">
+                                <div style="font-size: 4rem;">${currentCard.icon}</div>
+                                <div>${currentCard.chinese}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-buttons">
+                        <button class="action-btn" style="width:48%;" onclick="navigateFlashcard(-1)">Previous</button>
+                        <button class="action-btn" style="width:48%;" onclick="navigateFlashcard(1)">Next</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function flipCard(sceneElement) {
+            const card = sceneElement.querySelector('.flashcard');
+            card.classList.toggle('is-flipped');
+        }
+
+        function navigateFlashcard(direction) {
+            const vocab = currentLevel.vocabulary;
+            currentFlashcardIndex += direction;
+            if (currentFlashcardIndex < 0) currentFlashcardIndex = vocab.length - 1;
+            if (currentFlashcardIndex >= vocab.length) currentFlashcardIndex = 0;
+            renderFlashcardUI();
+        }
+
+        // --- ACTIVITY 4: UNSCRAMBLE VOCAB ---
+        function startVocabUnscramble() {
+            currentVocabUnscrambleIndex = 0;
+            renderVocabUnscramble();
+        }
+
+        function scrambleString(str) {
+            let arr = str.split('');
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            let scrambled = arr.join('');
+            if (scrambled === str && str.length > 3) return scrambleString(str);
+            return scrambled;
+        }
+
+        function renderVocabUnscramble() {
+            const wordsList = currentLevel.unscrambleWords;
+            const originalWord = wordsList[currentVocabUnscrambleIndex];
+            const scrambledWord = scrambleString(originalWord);
+            
+            appContainer.innerHTML = `
+                <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+                <div class="reading-container animate-pop" style="text-align:center;">
+                    <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                        <span>Word ${currentVocabUnscrambleIndex + 1} of ${wordsList.length}</span>
+                    </div>
+                    <h2 style="margin-top:0;">Unscramble the Word</h2>
+                    
+                    <div style="font-size: 3rem; font-weight: bold; letter-spacing: 10px; color: var(--neon-pink); margin: 2rem 0; font-family: 'Orbitron', sans-serif;">
+                        ${scrambledWord.toUpperCase()}
+                    </div>
+                    
+                    <input type="text" id="unscramble-input" placeholder="Type correct word..." autocomplete="off">
+                    
+                    <button class="action-btn" onclick="checkVocabUnscramble('${originalWord}')">Check Word</button>
+                </div>
+            `;
+        }
+
+        function checkVocabUnscramble(correctWord) {
+            const inputEl = document.getElementById('unscramble-input');
+            const userWord = inputEl.value.trim().toLowerCase();
+            
+            if (userWord === correctWord.toLowerCase()) {
+                inputEl.style.borderColor = 'var(--neon-green)';
+                inputEl.style.boxShadow = '0 0 15px var(--neon-green)';
+                updateXP(10);
+                setTimeout(() => {
+                    currentVocabUnscrambleIndex++;
+                    if (currentVocabUnscrambleIndex >= currentLevel.unscrambleWords.length) {
+                        alert("Unscramble Challenge Complete! (+50 XP Bonus)");
+                        updateXP(50);
+                        renderMenu();
+                    } else {
+                        renderVocabUnscramble();
+                    }
+                }, 1000);
+            } else {
+                inputEl.style.borderColor = 'var(--neon-red)';
+                inputEl.classList.add('shake');
+                setTimeout(() => inputEl.classList.remove('shake'), 400);
+            }
+        }
+
+        // --- ACTIVITY 5: SENTENCE BUILDER ---
+        function startSentenceUnscramble() {
+            currentSentenceIndex = 0;
+            renderSentenceUnscramble();
+        }
+
+        function renderSentenceUnscramble() {
+            const sentencesList = currentLevel.sentences;
+            const sentence = sentencesList[currentSentenceIndex];
+            let words = sentence.split(' ');
+            
+            let scrambledWords = [...words];
+            for (let i = scrambledWords.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [scrambledWords[i], scrambledWords[j]] = [scrambledWords[j], scrambledWords[i]];
+            }
+
+            const wordsHTML = scrambledWords.map((w, i) => 
+                `<div class="draggable-word" id="word-${i}" onclick="moveWordOnClick(this)">${w}</div>`
+            ).join('');
+
+            appContainer.innerHTML = `
+                <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+                <div class="reading-container animate-pop">
+                    <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                        <span>Sentence ${currentSentenceIndex + 1} of ${sentencesList.length}</span>
+                    </div>
+                    <h2 style="margin-top:0;">Build the Sentence</h2>
+                    <p style="color:var(--text-muted);">Click words to move them in order.</p>
+                    
+                    <div id="sentence-answer-zone" class="sentence-dropzone">
+                        <!-- Dropped words appear here -->
+                    </div>
+                    
+                    <div id="sentence-word-bank" class="word-bank">
+                        ${wordsHTML}
+                    </div>
+                    
+                    <button class="action-btn" onclick="checkSentenceUnscramble('${sentence.replace(/'/g, "\\'")}')">Check Sentence</button>
+                </div>
+            `;
+        }
+
+        function moveWordOnClick(element) {
+            const answerZone = document.getElementById('sentence-answer-zone');
+            const wordBank = document.getElementById('sentence-word-bank');
+            
+            if (element.parentNode.id === 'sentence-word-bank') {
+                answerZone.appendChild(element);
+            } else {
+                wordBank.appendChild(element);
+            }
+        }
+
+        function checkSentenceUnscramble(correctSentence) {
+            const answerZone = document.getElementById('sentence-answer-zone');
+            const currentWords = Array.from(answerZone.children).map(el => el.innerText);
+            const userSentence = currentWords.join(' ');
+            
+            if (userSentence === correctSentence) {
+                answerZone.style.borderColor = 'var(--neon-green)';
+                answerZone.style.boxShadow = '0 0 15px var(--neon-green) inset';
+                updateXP(20);
+                setTimeout(() => {
+                    currentSentenceIndex++;
+                    if (currentSentenceIndex >= currentLevel.sentences.length) {
+                        alert("Sentence Builder Complete! (+50 XP Bonus)");
+                        updateXP(50);
+                        renderMenu();
+                    } else {
+                        renderSentenceUnscramble();
+                    }
+                }, 1500);
+            } else {
+                answerZone.style.borderColor = 'var(--neon-red)';
+                answerZone.classList.add('shake');
+                setTimeout(() => answerZone.classList.remove('shake'), 400);
+            }
+        }
+
+        
+       // --- ACTIVITY 6: PLAYER COUNTRY GUESS CHALLENGE ---
+function startAthleteChallenge() {
+    athleteChallengeIndex = 0;
+    activeAthletes = [...athletesDB].sort(() => 0.5 - Math.random());
+    renderAthleteChallenge();
+}
+
+function renderAthleteChallenge() {
+    if (athleteChallengeIndex >= activeAthletes.length) {
+        alert("Player Country Challenge Complete! You're a World Cup Expert.");
+        return renderMenu();
+    }
+
+    const currentAthlete = activeAthletes[athleteChallengeIndex];
+    
+    // Set correct country and draw random distinct distractors
+    let options = [currentAthlete.country];
+    let pool = ALL_COUNTRIES.filter(c => c !== currentAthlete.country);
+    pool.sort(() => 0.5 - Math.random());
+    options.push(...pool.slice(0, 5));
+    options.sort(() => 0.5 - Math.random()); 
+
+    appContainer.innerHTML = `
+        <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+        <div class="reading-container animate-pop" style="padding-bottom: 1rem; text-align: center;">
+            <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                <span>Player ${athleteChallengeIndex + 1} of ${activeAthletes.length}</span>
+            </div>
+
+            <div style="background: rgba(0, 243, 255, 0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--neon-blue); text-align: center;">
+                <strong style="color: var(--neon-blue); font-family: 'Orbitron', sans-serif; font-size: 1.5rem;">${currentAthlete.name}</strong>
+            </div>
+
+            <div id="athlete-feedback-zone" style="min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                <img src="${currentAthlete.img}" alt="${currentAthlete.name}" onerror="this.src='https://placehold.co/400x300/161625/ff00ea?text=${encodeURIComponent(currentAthlete.name)}'" style="width: 100%; max-width: 400px; border: 4px solid var(--neon-pink); border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 0 20px rgba(255,0,234,0.3);">
+            </div>
+
+            <h3 style="color: #fff; margin-bottom: 1rem;">Which country does this player represent?</h3>
+
+            <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                ${options.map(opt => `
+                    <button class="action-btn" style="margin-top: 0; padding: 1rem 0.5rem; font-size: 0.9rem; line-height: 1.3; word-wrap: break-word;" onclick="checkAthleteGuess(this, '${opt}', '${currentAthlete.country}')">${opt}</button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function checkAthleteGuess(btn, selected, correct) {
+    const allButtons = btn.parentElement.querySelectorAll('button');
+    allButtons.forEach(b => b.style.pointerEvents = 'none');
+
+        if (selected === correct) {
+        btn.classList.add('btn-correct');
+        updateXP(20);
+        setTimeout(() => {
+            athleteChallengeIndex++;
+            renderAthleteChallenge();
+        }, 1000);
+        } else {
+        btn.classList.add('btn-wrong');
+        const feedbackZone = document.getElementById('athlete-feedback-zone');
+        feedbackZone.innerHTML = `
+            <span style="display: block; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); font-size: 1.5rem; font-weight: bold; margin: 2rem 0; text-transform: uppercase; animation: shake 0.4s ease-in-out; font-family: 'Orbitron', sans-serif;">
+                Incorrect! ${activeAthletes[athleteChallengeIndex].name} plays for ${correct}.
+            </span>`;
+        setTimeout(() => {
+            athleteChallengeIndex++;
+            renderAthleteChallenge(); 
+        }, 2200);
+        }
+        }
+
+       // --- ACTIVITY 7: EMOJI SPORT GUESS CHALLENGE ---
+function startSportChallenge() {
+    sportChallengeIndex = 0;
+    activeSports = [...sportsDB].sort(() => 0.5 - Math.random());
+    renderSportChallenge();
+}
+
+function renderSportChallenge() {
+    if (sportChallengeIndex >= activeSports.length) {
+        alert("Emoji Sport Challenge Complete! You're a True Champion.");
+        return renderMenu();
+    }
+
+    const currentSport = activeSports[sportChallengeIndex];
+    
+    let options = [currentSport.name];
+    let pool = ALL_SPORTS.filter(n => n !== currentSport.name);
+    pool.sort(() => 0.5 - Math.random());
+    options.push(...pool.slice(0, 5));
+    options.sort(() => 0.5 - Math.random()); 
+
+    appContainer.innerHTML = `
+        <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+        <div class="reading-container animate-pop" style="padding-bottom: 1rem; text-align: center;">
+            <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                <span>Emoji Guess ${sportChallengeIndex + 1} of ${activeSports.length}</span>
+            </div>
+
+            <div id="sport-feedback-zone" style="min-height: 250px; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.4); border: 4px solid var(--neon-pink); border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 0 20px rgba(255,0,234,0.3);">
+                <span style="font-size: 6rem; text-shadow: 0 0 30px rgba(255, 0, 234, 0.8); user-select: none;">${currentSport.emoji}</span>
+            </div>
+
+            <h3 style="color: #fff; margin-bottom: 1rem;">Which sport do these emojis represent?</h3>
+
+            <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                ${options.map(opt => `
+                    <button class="action-btn" style="margin-top: 0; padding: 1rem 0.5rem; font-size: 0.9rem; line-height: 1.3; word-wrap: break-word;" onclick="checkSportGuess(this, '${opt}', '${currentSport.name}')">${opt}</button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function checkSportGuess(btn, selected, correct) {
+    const allButtons = btn.parentElement.querySelectorAll('button');
+    allButtons.forEach(b => b.style.pointerEvents = 'none');
+
+    if (selected === correct) {
+        btn.classList.add('btn-correct');
+        updateXP(20);
+        setTimeout(() => {
+            sportChallengeIndex++;
+            renderSportChallenge();
+        }, 1000);
+    } else {
+        btn.classList.add('btn-wrong');
+        const feedbackZone = document.getElementById('sport-feedback-zone');
+        feedbackZone.innerHTML = `
+            <span style="display: block; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); font-size: 1.5rem; font-weight: bold; margin: 2rem 0; text-transform: uppercase; animation: shake 0.4s ease-in-out; font-family: 'Orbitron', sans-serif;">
+                Incorrect! The answer is ${correct}.
+            </span>`;
+        setTimeout(() => {
+            sportChallengeIndex++;
+            renderSportChallenge(); 
+        }, 2200);
+    }
+}
+        
+        // Boot up
+        init();
+    </script>
+</body>
+</html>
