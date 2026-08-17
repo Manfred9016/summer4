@@ -443,6 +443,7 @@ const ALL_COUNTRIES = [
     "Netherlands", "Italy", "Croatia", "Japan", "South Korea", "Uruguay"
 ];
 
+
 // --- Sports emoji ---
  const sportsDB = [
     { name: "Football (Soccer)", emoji: "⚽" },
@@ -468,12 +469,22 @@ const ALL_COUNTRIES = [
     { name: "Formula 1", emoji: "🏎️" },
     { name: "MotoGP", emoji: "🏍️" },
     { name: "Boxing", emoji: "🥊" },
-    { name: "MMA", emoji: "🤼" },
+    { name: "MMA", emoji: "🤼🥊" },
     { name: "Billiards", emoji: "🎱" },
     { name: "Skateboarding", emoji: "🛹" },
     { name: "Surfing", emoji: "🏄" },
-    { name: "Snowboarding", emoji: "🏂" }
-];       
+    { name: "Snowboarding", emoji: "🏂" },
+    { name: "Skiing", emoji: "⛷️" },
+    { name: "Rock Climbing", emoji: "🧗‍♂️" },
+    { name: "Archery", emoji: "🏹" },
+    { name: "Fencing", emoji: "🤺" },
+    { name: "Rowing", emoji: "🚣" },
+    { name: "Sailing", emoji: "⛵" },
+    { name: "Diving", emoji: "🤿" },
+    { name: "Water Polo", emoji: "🤽" }
+];      
+
+
 
         const ALL_SPORTS = [
             "Football (Soccer)", "Cricket", "Basketball", "Baseball", "Badminton", 
@@ -514,6 +525,23 @@ const ALL_COUNTRIES = [
         "Only one team could be the champions, but many other teams became heroes.",
         "The games that no one expected to be possible.",
         "Some people think winning is all that matters."
+      ],
+    synonyms: [
+        { word: "compete", synonym: "contest / play" },
+        { word: "champion", synonym: "winner" },
+        { word: "globe", synonym: "world" },
+        { word: "athlete", synonym: "player / sportsman" },
+        { word: "tournament", synonym: "competition" },
+        { word: "stage", synonym: "phase" },
+        { word: "tie", synonym: "draw" },
+        { word: "grand", synonym: "huge / magnificent" },
+        { word: "beat", synonym: "defeat" },
+        { word: "commercial", synonym: "advertisement" },
+        { word: "fame", synonym: "popularity" },
+        { word: "upset", synonym: "surprise victory" },
+        { word: "tale", synonym: "story" },
+        { word: "spectator", synonym: "viewer / fan" },
+        { word: "underdog", synonym: "unlikely winner" }
       ]
     },
     {
@@ -546,6 +574,21 @@ const ALL_COUNTRIES = [
         "The team that isn't expected to win sometimes ends up receiving more love.",
         "Some people think winning is all that matters, and even if you cheat it is fine.",
         "It might just be a game, but it is full of passion and drama."
+      ],
+      synonyms: [
+        { word: "championship", synonym: "title match" },
+        { word: "elimination", synonym: "removal" },
+        { word: "bracket", synonym: "grouping" },
+        { word: "admirer", synonym: "fan / supporter" },
+        { word: "struggle", synonym: "fight / strive" },
+        { word: "pitch", synonym: "field / arena" },
+        { word: "shocked", synonym: "surprised" },
+        { word: "villain", synonym: "bad guy" },
+        { word: "skill", synonym: "ability / talent" },
+        { word: "unfair", synonym: "unjust" },
+        { word: "cheat", synonym: "deceive" },
+        { word: "passion", synonym: "enthusiasm" },
+        { word: "drama", synonym: "excitement" }
       ]
     }
   ]
@@ -623,6 +666,10 @@ const ALL_COUNTRIES = [
                         <div style="font-size: 3rem;">🧩</div>
                         <h3>Sentence Builder</h3>
                     </div>
+                    <div class="level-card" onclick="startSynonymMatch()">
+                         <div style="font-size: 3rem;">🔗</div>
+                         <h3>Synonym Match</h3>
+                      </div>
                     <div class="level-card" onclick="startAthleteChallenge()">
                          <div style="font-size: 3rem;">🌍</div>
                         <h3>Guess the Country</h3>
@@ -1131,6 +1178,93 @@ function checkSportGuess(btn, selected, correct) {
         
         // Boot up
         init();
+
+let synonymChallengeIndex = 0;
+let activeSynonyms = [];
+
+// --- ACTIVITY 8: SYNONYM MATCH CHALLENGE ---
+function startSynonymMatch() {
+    if (!currentLevel.synonyms || currentLevel.synonyms.length === 0) {
+        alert("No synonyms available for this level.");
+        return;
+    }
+    synonymChallengeIndex = 0;
+    // Shuffle the synonym pairs for random order
+    activeSynonyms = [...currentLevel.synonyms].sort(() => 0.5 - Math.random());
+    renderSynonymMatch();
+}
+
+function renderSynonymMatch() {
+    if (synonymChallengeIndex >= activeSynonyms.length) {
+        alert("Synonym Master! Challenge Complete. (+50 XP Bonus)");
+        updateXP(50);
+        return renderMenu();
+    }
+
+    const currentPair = activeSynonyms[synonymChallengeIndex];
+    
+    // Generate distractors (wrong answers) from other synonyms in the level
+    let options = [currentPair.synonym];
+    let pool = currentLevel.synonyms
+        .map(s => s.synonym)
+        .filter(syn => syn !== currentPair.synonym);
+    
+    pool.sort(() => 0.5 - Math.random());
+    options.push(...pool.slice(0, 3)); // Get 3 random wrong answers
+    options.sort(() => 0.5 - Math.random()); // Shuffle the 4 options
+
+    appContainer.innerHTML = `
+        <button class="action-btn" style="width:auto; margin-bottom: 1rem;" onclick="renderMenu()">← Back to Menu</button>
+        <div class="reading-container animate-pop" style="padding-bottom: 1rem; text-align: center;">
+            <div style="display:flex; justify-content:space-between; color:var(--text-muted); margin-bottom:1rem;">
+                <span>Word ${synonymChallengeIndex + 1} of ${activeSynonyms.length}</span>
+            </div>
+
+            <h2 style="color: #fff; margin-bottom: 0.5rem;">Find the closest synonym for:</h2>
+            
+            <div style="background: rgba(255, 0, 234, 0.05); padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border: 2px dashed var(--neon-pink); text-align: center;">
+                <strong style="color: var(--neon-pink); text-shadow: 0 0 15px rgba(255,0,234,0.5); font-family: 'Orbitron', sans-serif; font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase;">
+                    ${currentPair.word}
+                </strong>
+            </div>
+
+            <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                ${options.map(opt => `
+                    <button class="action-btn" style="margin-top: 0; padding: 1.2rem; font-size: 1.1rem;" onclick="checkSynonymGuess(this, '${opt}', '${currentPair.synonym}')">${opt}</button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function checkSynonymGuess(btn, selected, correct) {
+    const allButtons = btn.parentElement.querySelectorAll('button');
+    allButtons.forEach(b => b.style.pointerEvents = 'none');
+
+    if (selected === correct) {
+        btn.classList.add('btn-correct');
+        updateXP(10);
+        setTimeout(() => {
+            synonymChallengeIndex++;
+            renderSynonymMatch();
+        }, 1000);
+    } else {
+        btn.classList.add('btn-wrong');
+        btn.classList.add('shake');
+        
+        // Highlight the correct answer
+        allButtons.forEach(b => {
+            if (b.innerText === correct) {
+                b.classList.add('btn-correct');
+            }
+        });
+
+        setTimeout(() => {
+            synonymChallengeIndex++;
+            renderSynonymMatch(); 
+        }, 2000);
+    }
+}
     </script>
 </body>
 </html>
