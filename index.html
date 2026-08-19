@@ -475,15 +475,19 @@ const ALL_COUNTRIES = [
     { name: "Surfing", emoji: "🏄" },
     { name: "Snowboarding", emoji: "🏂" },
     { name: "Skiing", emoji: "⛷️" },
-    { name: "Rock Climbing", emoji: "🧗‍♂️" },
     { name: "Archery", emoji: "🏹" },
     { name: "Fencing", emoji: "🤺" },
     { name: "Rowing", emoji: "🚣" },
     { name: "Sailing", emoji: "⛵" },
     { name: "Diving", emoji: "🤿" },
-    { name: "Water Polo", emoji: "🤽" }
+    { name: "Water Polo", emoji: "🤽" },
+    { name: "Handball", emoji: "🤾" },
+    { name: "Rugby", emoji: "🏉🏃" },
+    { name: "Lacrosse", emoji: "🥍🤾" },
+    { name: "Bowling", emoji: "🎳" },
+    { name: "Darts", emoji: "🎯" },
+    { name: "Weightlifting", emoji: "🏋️" },
 ];      
-
 
 
         const ALL_SPORTS = [
@@ -511,7 +515,7 @@ const ALL_COUNTRIES = [
         { word: "commercial", chinese: "廣告", icon: "📺" },
         { word: "upset", chinese: "爆冷門", icon: "😲" },
         { word: "underdog", chinese: "不被看好的隊伍", icon: "🐕" },
-        { word: "sportsmanship", chinese: "體育精神", icon: "🤝" }
+        { word: "sportsmanship", chinese: "體育精神 / 運動員風範", icon: "🤝" }
       ],
       questions: [
         { type: "fill", q: "1. How many teams were there at the start of the 2026 World Cup?", answer: "48" },
@@ -547,13 +551,13 @@ const ALL_COUNTRIES = [
     {
       id: "intermediate",
       title: "World Cup 2026 - Advanced",
-      description: "Deep dive into the elimination rounds, heroic goalkeepers, and teams turning from heroes to villains[cite: 3].",
+      description: "Deep dive into the elimination rounds, heroic goalkeepers, and teams turning from heroes to villains.",
       image: "world cup 2.jpg",
       reading: [
-        { country: "A World Tournament", text: "48 teams from 48 different countries competed to be number one[cite: 3]. The World Cup is single elimination, or sometimes called the knockout round, where there can be no more ties[cite: 3]. 32 teams become 16 teams, and 16 becomes 8[cite: 3]. Then we move onto the semi-finals, and at last the final game, sometimes called the grand final[cite: 3]. This year, the Spanish team became the champions when they beat the Argentinian team[cite: 3]." },
-        { country: "Where Heroes are Born", text: "Some of the teams and players found new admirers and fans, even though they lost[cite: 3]. People saw how hard they struggled, and how much they improved[cite: 3]. One of those new global stars is Erling Haaland from Norway[cite: 3]. His fame went far outside of the football pitch[cite: 3]. Because of this, people who have never watched a football game have been singing his name and recognize his face[cite: 3]." },
-        { country: "The Unexpected", text: "The underdogs from DR Congo tied the previous champions, Portugal, with a 1-1 draw[cite: 3]. Cape Verde’s goalkeeper, named Vozinha, shocked the world[cite: 3]. He is 40 years old, an age when most people quit playing professionally, but is now a hero in his home country[cite: 3]. Football clubs all over the world were hoping he would come play for one of their teams[cite: 3]." },
-        { country: "From Heroes to Villains", text: "Argentina was expected to win, and people were cheering on Messi the whole tournament, but in the end, Argentina lost more than just a soccer game[cite: 3]. People watched them not only play with less skill and talent than Spain, they also saw them play dirty and unfair[cite: 3]. They didn’t show the sportsmanship that you would expect from some of the best players in the world[cite: 3]. Some people think winning is all that matters, and even if you have to cheat, or break rules to win it is fine[cite: 3]." }
+        { country: "A World Tournament", text: "48 teams from 48 different countries competed to be number one. The World Cup is single elimination, or sometimes called the knockout round, where there can be no more ties. 32 teams become 16 teams, and 16 becomes 8. Then we move onto the semi-finals, and at last the final game, sometimes called the grand final. This year, the Spanish team became the champions when they beat the Argentinian team." },
+        { country: "Where Heroes are Born", text: "Some of the teams and players found new admirers and fans, even though they lost. People saw how hard they struggled, and how much they improved. One of those new global stars is Erling Haaland from Norway. His fame went far outside of the football pitch. Because of this, people who have never watched a football game have been singing his name and recognize his face." },
+        { country: "The Unexpected", text: "The underdogs from DR Congo tied the previous champions, Portugal, with a 1-1 draw. Cape Verde’s goalkeeper, named Vozinha, shocked the world. He is 40 years old, an age when most people quit playing professionally, but is now a hero in his home country. Football clubs all over the world were hoping he would come play for one of their teams." },
+        { country: "From Heroes to Villains", text: "Argentina was expected to win, and people were cheering on Messi the whole tournament, but in the end, Argentina lost more than just a soccer game. People watched them not only play with less skill and talent than Spain, they also saw them play dirty and unfair. They didn’t show the sportsmanship that you would expect from some of the best players in the world. Some people think winning is all that matters, and even if you have to cheat, or break rules to win it is fine." }
       ],
       vocabulary: [
         { word: "elimination", chinese: "淘汰", icon: "❌" },
@@ -561,13 +565,16 @@ const ALL_COUNTRIES = [
         { word: "pitch", chinese: "足球場", icon: "🏟️" },
         { word: "shocked", chinese: "震驚的", icon: "😲" },
         { word: "villain", chinese: "反派主角", icon: "🦹" },
-        { word: "passion", chinese: "熱情", icon: "❤️‍🔥" }
+        { word: "passion", chinese: "熱情", icon: "❤️‍🔥" },
+        { word:"sportsmanship", chinese: "體育精神 / 運動員風範", icon: "🤝" },
+        { word: "underdog", chinese: "不被看好的隊伍", icon: "🐕" },
+        { word: "fame", chinese: "名聲", icon: "🌟" }
       ],
       questions: [
-        { type: "mc", q: "1. How many teams made it to the elimination or knockout round of the World Cup?[cite: 3]", options: ["48 teams", "32 teams", "16 teams", "2 teams"], answer: 1 },
-        { type: "fill", q: "2. What name is given to teams or players that are not expected to win?[cite: 3]", answer: "underdogs" },
-        { type: "mc", q: "3. Which team finished in second place during the 2026 FIFA World Cup?[cite: 3]", options: ["Spain", "Argentina", "Portugal", "Cape Verde"], answer: 1 },
-        { type: "fill", q: "4. When will the next World Cup take place?[cite: 3]", answer: "2030" }
+        { type: "mc", q: "1. How many teams made it to the elimination or knockout round of the World Cup?", options: ["48 teams", "32 teams", "16 teams", "2 teams"], answer: 1 },
+        { type: "fill", q: "2. What name is given to teams or players that are not expected to win?", answer: "underdogs" },
+        { type: "mc", q: "3. Which team finished in second place during the 2026 FIFA World Cup?", options: ["Spain", "Argentina", "Portugal", "Cape Verde"], answer: 1 },
+        { type: "fill", q: "4. When will the next World Cup take place?", answer: "2030" }
       ],
       unscrambleWords: ["elimination", "villain", "spectator", "struggle", "passion"],
       sentences: [
